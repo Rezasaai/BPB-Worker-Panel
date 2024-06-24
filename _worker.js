@@ -81,7 +81,7 @@ export default {
 
                     case '/panel':
 
-                        if (typeof env.rezas!== 'object') {
+                        if (typeof env.rsae!== 'object') {
                             const errorPage = renderErrorPage('KV Dataset is not properly set!', null, true);
                             return new Response(errorPage, { status: 200, headers: {'Content-Type': 'text/html'}});
                         }
@@ -117,7 +117,7 @@ export default {
                                                       
                     case '/login':
 
-                        if (typeof env.rezas!== 'object') {
+                        if (typeof env.rsae!== 'object') {
                             const errorPage = renderErrorPage('KV Dataset is not properly set!', null, true);
                             return new Response(errorPage, { status: 200, headers: {'Content-Type': 'text/html'}});
                         }
@@ -823,18 +823,18 @@ const generateRemark = (index, port) => {
     switch (index) {
         case 0:
         case 1:
-            remark = `👹 rsae63 - Domain_${index + 1} : ${port}`;
+            remark = `👹 rsae- Domain_${index + 1} : ${port}`;
             break;
         case 2:
         case 3:
-            remark = `👹 rsae63 - IPv4_${index - 1} : ${port}`;
+            remark = `👹 rsae- IPv4_${index - 1} : ${port}`;
             break;
         case 4:
         case 5:
-            remark = `👹 rsae63 - IPv6_${index - 3} : ${port}`;
+            remark = `👹 rsae- IPv6_${index - 3} : ${port}`;
             break;
         default:
-            remark = `👹 rsae63 - Clean IP_${index - 5} : ${port}`;
+            remark = `👹 rsae- Clean IP_${index - 5} : ${port}`;
             break;
     }
 
@@ -966,7 +966,7 @@ const buildWorkerLessConfig = async (env, client) => {
     fakeOutbound.tag = 'fake-outbound';
 
     let fragConfig = structuredClone(xrayConfigTemp);
-    fragConfig.remarks  = '👹 rsae63 Frag - WorkerLess ⭐'
+    fragConfig.remarks  = '👹 rsaeFrag - WorkerLess ⭐'
     fragConfig.dns = await buildDNSObject(remoteDNS, localDNS, blockAds, bypassIran, blockPorn, true);
     fragConfig.outbounds[0].settings.domainStrategy = 'UseIP';
     fragConfig.outbounds[0].settings.fragment.length = `${lengthMin}-${lengthMax}`;
@@ -1108,7 +1108,7 @@ const getFragmentConfigs = async (env, hostName, client) => {
     };
 
     let bestPing = structuredClone(xrayConfigTemp);
-    bestPing.remarks = '👹 rsae63 Frag - Best Ping 💥';
+    bestPing.remarks = '👹 rsaeFrag - Best Ping 💥';
     bestPing.dns = await buildDNSObject(remoteDNS, localDNS, blockAds, bypassIran, blockPorn);
     bestPing.outbounds[0].settings.fragment.length = `${lengthMin}-${lengthMax}`;
     bestPing.outbounds[0].settings.fragment.interval = `${intervalMin}-${intervalMax}`;
@@ -1129,7 +1129,7 @@ const getFragmentConfigs = async (env, hostName, client) => {
     }
 
     let bestFragment = structuredClone(xrayConfigTemp);
-    bestFragment.remarks = '👹 rsae63 Frag - Best Fragment 😎';
+    bestFragment.remarks = '👹 rsaeFrag - Best Fragment 😎';
     bestFragment.dns = await buildDNSObject(remoteDNS, localDNS, blockAds, bypassIran, blockPorn);
     bestFragment.outbounds.splice(0,1);
     bestFragValues.forEach( (fragLength, index) => {
@@ -1304,7 +1304,7 @@ const getWoWConfig = async (env, client) => {
         singboxOutbounds.push(singboxOutbound);
     }
 
-    wowConfigXray.remarks = '👹 rsae63 - Warp on Warp 🚀';
+    wowConfigXray.remarks = '👹 rsae- Warp on Warp 🚀';
     wowConfigXray.dns = await buildDNSObject(remoteDNS, localDNS, blockAds, bypassIran, blockPorn);
     wowConfigXray.routing.rules = buildRoutingRules(localDNS, blockAds, bypassIran, blockPorn, bypassLAN, false, false);
     wowConfigXray.outbounds.splice(0,1);
@@ -1315,7 +1315,7 @@ const getWoWConfig = async (env, client) => {
     let warpConfigXray = structuredClone(wowConfigXray);
     warpConfigXray.outbounds.splice(0,1);
     warpConfigXray.routing.rules[warpConfigXray.routing.rules.length - 1].outboundTag = 'warp-ir';
-    warpConfigXray.remarks = '👹 rsae63 - Warp';
+    warpConfigXray.remarks = '👹 rsae- Warp';
 
     wowConfigSingbox.dns.servers[0].address = remoteDNS;
     wowConfigSingbox.dns.servers[1].address = localDNS;
@@ -1509,7 +1509,7 @@ const updateDataset = async (env, Settings) => {
     };
 
     try {    
-        await env.rezas.put("proxySettings", JSON.stringify(proxySettings));          
+        await env.rsae.put("proxySettings", JSON.stringify(proxySettings));          
     } catch (error) {
         console.log(error);
         throw new Error(`An error occurred while updating KV - ${error}`);
@@ -1696,7 +1696,7 @@ const renderHomePage = async (env, hostName, fragConfigs) => {
 	<head>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>rsae63 Panel ${panelVersion}</title>
+        <title>rsaePanel ${panelVersion}</title>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 		<style>
@@ -1914,7 +1914,7 @@ const renderHomePage = async (env, hostName, fragConfigs) => {
 	</head>
 	
 	<body>
-		<h1>rsae63 Panel <span style="font-size: smaller;">${panelVersion}</span> 👹</h1>
+		<h1>rsaePanel <span style="font-size: smaller;">${panelVersion}</span> 👹</h1>
 		<div class="form-container">
             <h2>FRAGMENT SETTINGS ⚙️</h2>
 			<form id="configForm">
@@ -2128,10 +2128,10 @@ const renderHomePage = async (env, hostName, fragConfigs) => {
                             </div>
                         </td>
                         <td>
-                            <button onclick="openQR('https://${hostName}/fragsub/${userID}#rsae63 Fragment', 'Fragment Subscription')" style="margin-bottom: 8px;">
+                            <button onclick="openQR('https://${hostName}/fragsub/${userID}#rsaeFragment', 'Fragment Subscription')" style="margin-bottom: 8px;">
                                 QR Code&nbsp;<span class="material-symbols-outlined">qr_code</span>
                             </button>
-                            <button onclick="copyToClipboard('https://${hostName}/fragsub/${userID}#rsae63 Fragment', true)">
+                            <button onclick="copyToClipboard('https://${hostName}/fragsub/${userID}#rsaeFragment', true)">
                                 Copy Sub<span class="material-symbols-outlined">format_list_bulleted</span>
                             </button>
                         </td>
@@ -2560,7 +2560,7 @@ const renderLoginPage = async () => {
     </head>
     <body>
         <div class="container">
-            <h1>rsae63 Panel <span style="font-size: smaller;">${panelVersion}</span> 👹</h1>
+            <h1>rsaePanel <span style="font-size: smaller;">${panelVersion}</span> 👹</h1>
             <div class="form-container">
                 <h2>User Login</h2>
                 <form id="loginForm">
@@ -2631,7 +2631,7 @@ const renderErrorPage = (message, error, refer) => {
 
     <body>
         <div id="error-container">
-            <h1>rsae63 Panel <span style="font-size: smaller;">${panelVersion}</span> 👹</h1>
+            <h1>rsaePanel <span style="font-size: smaller;">${panelVersion}</span> 👹</h1>
             <div id="error-message">
                 <h2>${message} ${refer 
                     ? 'Please try again or refer to <a href="https://github.com/bia-pain-bache/rsae63-Worker-Panel/blob/main/README.md">documents</a>' 
