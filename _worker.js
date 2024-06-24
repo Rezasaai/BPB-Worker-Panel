@@ -81,7 +81,7 @@ export default {
 
                     case '/panel':
 
-                        if (typeof env.rsae63 !== 'object') {
+                        if (typeof env.rezas!== 'object') {
                             const errorPage = renderErrorPage('KV Dataset is not properly set!', null, true);
                             return new Response(errorPage, { status: 200, headers: {'Content-Type': 'text/html'}});
                         }
@@ -117,7 +117,7 @@ export default {
                                                       
                     case '/login':
 
-                        if (typeof env.rsae63 !== 'object') {
+                        if (typeof env.rezas!== 'object') {
                             const errorPage = renderErrorPage('KV Dataset is not properly set!', null, true);
                             return new Response(errorPage, { status: 200, headers: {'Content-Type': 'text/html'}});
                         }
@@ -1509,7 +1509,7 @@ const updateDataset = async (env, Settings) => {
     };
 
     try {    
-        await env.rsae63.put("proxySettings", JSON.stringify(proxySettings));          
+        await env.rezas.put("proxySettings", JSON.stringify(proxySettings));          
     } catch (error) {
         console.log(error);
         throw new Error(`An error occurred while updating KV - ${error}`);
