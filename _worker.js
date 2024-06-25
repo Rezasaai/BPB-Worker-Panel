@@ -1,7 +1,7 @@
 // @ts-nocheck
 // <!--GAMFC-->version base on commit 43fad05dcdae3b723c53c226f8181fc5bd47223e, time is 2023-06-22 15:20:02 UTC<!--GAMFC-END-->.
 // @ts-ignore
-// https://github.com/bia-pain-bache/rsae63-Worker-Panel
+// https://github.com/bia-pain-bache/rsae-Worker-Panel
 
 import { connect } from 'cloudflare:sockets';
 
@@ -20,7 +20,7 @@ let proxyIP = proxyIPs[Math.floor(Math.random() * proxyIPs.length)];
 
 let dohURL = 'https://cloudflare-dns.com/dns-query';
 
-let panelVersion = '1.0.3';
+let panelVersion = '0.1.3';
 
 if (!isValidUUID(userID)) {
     throw new Error('uuid is not valid');
@@ -81,7 +81,7 @@ export default {
 
                     case '/panel':
 
-                        if (typeof env.rsae!== 'object') {
+                        if (typeof env.rsae !== 'object') {
                             const errorPage = renderErrorPage('KV Dataset is not properly set!', null, true);
                             return new Response(errorPage, { status: 200, headers: {'Content-Type': 'text/html'}});
                         }
@@ -98,7 +98,7 @@ export default {
                         }
                         
                         if (!isAuth) return Response.redirect(`${url.origin}/login`, 302);
-                        if (! await env.rsae63.get('proxySettings')) await updateDataset(env);
+                        if (! await env.rsae.get('proxySettings')) await updateDataset(env);
                         const fragConfs = await getFragmentConfigs(env, host, 'nekoray');
                         const homePage = await renderHomePage(env, host, fragConfs);
 
@@ -117,7 +117,7 @@ export default {
                                                       
                     case '/login':
 
-                        if (typeof env.rsae!== 'object') {
+                        if (typeof env.rsae !== 'object') {
                             const errorPage = renderErrorPage('KV Dataset is not properly set!', null, true);
                             return new Response(errorPage, { status: 200, headers: {'Content-Type': 'text/html'}});
                         }
@@ -125,18 +125,18 @@ export default {
                         const loginAuth = await Authenticate(request, env);
                         if (loginAuth) return Response.redirect(`${url.origin}/panel`, 302);
 
-                        let secretKey = await env.rsae63.get('secretKey');
-                        const pwd = await env.rsae63.get('pwd');
-                        if (!pwd) await env.rsae63.put('pwd', 'rsae63');
+                        let secretKey = await env.rsae.get('secretKey');
+                        const pwd = await env.rsae.get('pwd');
+                        if (!pwd) await env.rsae.put('pwd', 'rsae63');
 
                         if (!secretKey) {
                             secretKey = generateSecretKey();
-                            await env.rsae63.put('secretKey', secretKey);
+                            await env.rsae.put('secretKey', secretKey);
                         }
 
                         if (request.method === 'POST') {
                             const password = await request.text();
-                            const savedPass = await env.rsae63.get('pwd');
+                            const savedPass = await env.rsae.get('pwd');
 
                             if (password === savedPass) {
                                 const jwtToken = generateJWTToken(secretKey, password);
@@ -184,9 +184,9 @@ export default {
                         let passAuth = await Authenticate(request, env);
                         if (!passAuth) return new Response('Unauthorized!', { status: 401 });           
                         const newPwd = await request.text();
-                        const oldPwd = await env.rsae63.get('pwd');
+                        const oldPwd = await env.rsae.get('pwd');
                         if (newPwd === oldPwd) return new Response('Please enter a new Password!', { status: 400 });
-                        await env.rsae63.put('pwd', newPwd);
+                        await env.rsae.put('pwd', newPwd);
 
                         return new Response('Success', {
                             status: 200,
@@ -780,7 +780,7 @@ const getNormalConfigs = async (env, hostName, client) => {
     let vlessWsTls = '';
 
     try {
-        proxySettings = await env.rsae63.get("proxySettings", {type: 'json'});
+        proxySettings = await env.rsae.get("proxySettings", {type: 'json'});
     } catch (error) {
         console.log(error);
         throw new Error(`An error occurred while getting normal configs - ${error}`);
@@ -823,18 +823,18 @@ const generateRemark = (index, port) => {
     switch (index) {
         case 0:
         case 1:
-            remark = `👹 rsae- Domain_${index + 1} : ${port}`;
+            remark = `👹 rsae - Domain_${index + 1} : ${port}`;
             break;
         case 2:
         case 3:
-            remark = `👹 rsae- IPv4_${index - 1} : ${port}`;
+            remark = `👹 rsae - IPv4_${index - 1} : ${port}`;
             break;
         case 4:
         case 5:
-            remark = `👹 rsae- IPv6_${index - 3} : ${port}`;
+            remark = `👹 rsae - IPv6_${index - 3} : ${port}`;
             break;
         default:
-            remark = `👹 rsae- Clean IP_${index - 5} : ${port}`;
+            remark = `👹 rsae - Clean IP_${index - 5} : ${port}`;
             break;
     }
 
@@ -945,7 +945,7 @@ const buildWorkerLessConfig = async (env, client) => {
     let proxySettings = {};
 
     try {
-        proxySettings = await env.rsae63.get("proxySettings", {type: 'json'});
+        proxySettings = await env.rsae.get("proxySettings", {type: 'json'});
     } catch (error) {
         console.log(error);
         throw new Error(`An error occurred while generating WorkerLess config - ${error}`);
@@ -966,7 +966,7 @@ const buildWorkerLessConfig = async (env, client) => {
     fakeOutbound.tag = 'fake-outbound';
 
     let fragConfig = structuredClone(xrayConfigTemp);
-    fragConfig.remarks  = '👹 rsaeFrag - WorkerLess ⭐'
+    fragConfig.remarks  = '👹 rsae Frag - WorkerLess ⭐'
     fragConfig.dns = await buildDNSObject(remoteDNS, localDNS, blockAds, bypassIran, blockPorn, true);
     fragConfig.outbounds[0].settings.domainStrategy = 'UseIP';
     fragConfig.outbounds[0].settings.fragment.length = `${lengthMin}-${lengthMax}`;
@@ -1001,7 +1001,7 @@ const getFragmentConfigs = async (env, hostName, client) => {
                             '40-60', '50-70', '60-80', '70-90', '80-100', '100-200']
 
     try {
-        proxySettings = await env.rsae63.get("proxySettings", {type: 'json'});
+        proxySettings = await env.rsae.get("proxySettings", {type: 'json'});
     } catch (error) {
         console.log(error);
         throw new Error(`An error occurred while getting fragment configs - ${error}`);
@@ -1041,7 +1041,7 @@ const getFragmentConfigs = async (env, hostName, client) => {
         } catch (error) {
             console.log('An error occured while parsing chain proxy: ', error);
             proxyOutbound = undefined;
-            await env.rsae63.put("proxySettings", JSON.stringify({
+            await env.rsae.put("proxySettings", JSON.stringify({
                 ...proxySettings, 
                 outProxy: '',
                 outProxyParams: ''}));
@@ -1108,7 +1108,7 @@ const getFragmentConfigs = async (env, hostName, client) => {
     };
 
     let bestPing = structuredClone(xrayConfigTemp);
-    bestPing.remarks = '👹 rsaeFrag - Best Ping 💥';
+    bestPing.remarks = '👹 rsae Frag - Best Ping 💥';
     bestPing.dns = await buildDNSObject(remoteDNS, localDNS, blockAds, bypassIran, blockPorn);
     bestPing.outbounds[0].settings.fragment.length = `${lengthMin}-${lengthMax}`;
     bestPing.outbounds[0].settings.fragment.interval = `${intervalMin}-${intervalMax}`;
@@ -1129,7 +1129,7 @@ const getFragmentConfigs = async (env, hostName, client) => {
     }
 
     let bestFragment = structuredClone(xrayConfigTemp);
-    bestFragment.remarks = '👹 rsaeFrag - Best Fragment 😎';
+    bestFragment.remarks = '👹 rsae Frag - Best Fragment 😎';
     bestFragment.dns = await buildDNSObject(remoteDNS, localDNS, blockAds, bypassIran, blockPorn);
     bestFragment.outbounds.splice(0,1);
     bestFragValues.forEach( (fragLength, index) => {
@@ -1191,7 +1191,7 @@ const getSingboxConfig = async (env, hostName) => {
     let proxySettings = {};
     
     try {
-        proxySettings = await env.rsae63.get("proxySettings", {type: 'json'});
+        proxySettings = await env.rsae.get("proxySettings", {type: 'json'});
     } catch (error) {
         console.log(error);
         throw new Error(`An error occurred while getting sing-box configs - ${error}`);
@@ -1239,7 +1239,7 @@ const getWoWConfig = async (env, client) => {
     let xrayOutbounds = [], singboxOutbounds = [];
 
     try {
-        proxySettings = await env.rsae63.get("proxySettings", {type: 'json'});
+        proxySettings = await env.rsae.get("proxySettings", {type: 'json'});
     } catch (error) {
         console.log(error);
         throw new Error(`An error occurred while getting fragment configs - ${error}`);
@@ -1304,7 +1304,7 @@ const getWoWConfig = async (env, client) => {
         singboxOutbounds.push(singboxOutbound);
     }
 
-    wowConfigXray.remarks = '👹 rsae- Warp on Warp 🚀';
+    wowConfigXray.remarks = '👹 rsae - Warp on Warp 🚀';
     wowConfigXray.dns = await buildDNSObject(remoteDNS, localDNS, blockAds, bypassIran, blockPorn);
     wowConfigXray.routing.rules = buildRoutingRules(localDNS, blockAds, bypassIran, blockPorn, bypassLAN, false, false);
     wowConfigXray.outbounds.splice(0,1);
@@ -1315,7 +1315,7 @@ const getWoWConfig = async (env, client) => {
     let warpConfigXray = structuredClone(wowConfigXray);
     warpConfigXray.outbounds.splice(0,1);
     warpConfigXray.routing.rules[warpConfigXray.routing.rules.length - 1].outboundTag = 'warp-ir';
-    warpConfigXray.remarks = '👹 rsae- Warp';
+    warpConfigXray.remarks = '👹 rsae - Warp';
 
     wowConfigSingbox.dns.servers[0].address = remoteDNS;
     wowConfigSingbox.dns.servers[1].address = localDNS;
@@ -1587,7 +1587,7 @@ const generateSecretKey = () => {
 const Authenticate = async (request, env) => {
     
     try {
-        const secretKey = await env.rsae63.get('secretKey');
+        const secretKey = await env.rsae.get('secretKey');
         const cookie = request.headers.get('Cookie');
         const cookieMatch = cookie ? cookie.match(/(^|;\s*)jwtToken=([^;]*)/) : null;
         const token = cookieMatch ? cookieMatch.pop() : null;
@@ -1622,7 +1622,7 @@ const renderHomePage = async (env, hostName, fragConfigs) => {
     let proxySettings = {};
     
     try {
-        proxySettings = await env.rsae63.get("proxySettings", {type: 'json'});
+        proxySettings = await env.rsae.get("proxySettings", {type: 'json'});
     } catch (error) {
         console.log(error);
         throw new Error(`An error occurred while rendering home page - ${error}`);
@@ -1696,7 +1696,7 @@ const renderHomePage = async (env, hostName, fragConfigs) => {
 	<head>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>rsaePanel ${panelVersion}</title>
+        <title>rsae Panel ${panelVersion}</title>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 		<style>
@@ -1914,7 +1914,7 @@ const renderHomePage = async (env, hostName, fragConfigs) => {
 	</head>
 	
 	<body>
-		<h1>rsaePanel <span style="font-size: smaller;">${panelVersion}</span> 👹</h1>
+		<h1>rsae Panel <span style="font-size: smaller;">${panelVersion}</span> 👹</h1>
 		<div class="form-container">
             <h2>FRAGMENT SETTINGS ⚙️</h2>
 			<form id="configForm">
@@ -2058,10 +2058,10 @@ const renderHomePage = async (env, hostName, fragConfigs) => {
                             </div>
                         </td>
 						<td>
-                            <button onclick="openQR('https://${hostName}/sub/${userID}#rsae63-Normal', 'Normal Subscription')" style="margin-bottom: 8px;">
+                            <button onclick="openQR('https://${hostName}/sub/${userID}#rsae-Normal', 'Normal Subscription')" style="margin-bottom: 8px;">
                                 QR Code&nbsp;<span class="material-symbols-outlined">qr_code</span>
                             </button>
-                            <button onclick="copyToClipboard('https://${hostName}/sub/${userID}#rsae63-Normal', false)">
+                            <button onclick="copyToClipboard('https://${hostName}/sub/${userID}#rsae-Normal', false)">
                                 Copy Sub<span class="material-symbols-outlined">format_list_bulleted</span>
                             </button>
                         </td>
@@ -2078,7 +2078,7 @@ const renderHomePage = async (env, hostName, fragConfigs) => {
                             </div>
                         </td>
 						<td>
-                            <button onclick="copyToClipboard('https://${hostName}/sub/${userID}?app=singbox#rsae63-Normal', false)">
+                            <button onclick="copyToClipboard('https://${hostName}/sub/${userID}?app=singbox#rsae-Normal', false)">
                                 Copy Sub<span class="material-symbols-outlined">format_list_bulleted</span>
                             </button>
 						</td>
@@ -2091,10 +2091,10 @@ const renderHomePage = async (env, hostName, fragConfigs) => {
                             </div>
                         </td>
                         <td>
-                            <button onclick="openQR('sing-box://import-remote-profile?url=https://${hostName}/sub/${userID}?app=sfa#rsae63-Normal', 'Normal Subscription')" style="margin-bottom: 8px;">
+                            <button onclick="openQR('sing-box://import-remote-profile?url=https://${hostName}/sub/${userID}?app=sfa#rsae-Normal', 'Normal Subscription')" style="margin-bottom: 8px;">
                                 QR Code&nbsp;<span class="material-symbols-outlined">qr_code</span>
                             </button>
-                            <button onclick="copyToClipboard('https://${hostName}/sub/${userID}?app=sfa#rsae63-Normal', false)">
+                            <button onclick="copyToClipboard('https://${hostName}/sub/${userID}?app=sfa#rsae-Normal', false)">
                                 Copy Sub<span class="material-symbols-outlined">format_list_bulleted</span>
                             </button>
                         </td>
@@ -2128,10 +2128,10 @@ const renderHomePage = async (env, hostName, fragConfigs) => {
                             </div>
                         </td>
                         <td>
-                            <button onclick="openQR('https://${hostName}/fragsub/${userID}#rsaeFragment', 'Fragment Subscription')" style="margin-bottom: 8px;">
+                            <button onclick="openQR('https://${hostName}/fragsub/${userID}#rsae Fragment', 'Fragment Subscription')" style="margin-bottom: 8px;">
                                 QR Code&nbsp;<span class="material-symbols-outlined">qr_code</span>
                             </button>
-                            <button onclick="copyToClipboard('https://${hostName}/fragsub/${userID}#rsaeFragment', true)">
+                            <button onclick="copyToClipboard('https://${hostName}/fragsub/${userID}#rsae Fragment', true)">
                                 Copy Sub<span class="material-symbols-outlined">format_list_bulleted</span>
                             </button>
                         </td>
@@ -2165,10 +2165,10 @@ const renderHomePage = async (env, hostName, fragConfigs) => {
                             </div>
                         </td>
 						<td>
-                            <button onclick="openQR('https://${hostName}/wow/${userID}#rsae63-WoW', 'Warp on Warp Subscription')" style="margin-bottom: 8px;">
+                            <button onclick="openQR('https://${hostName}/wow/${userID}#rsae-WoW', 'Warp on Warp Subscription')" style="margin-bottom: 8px;">
                                 QR Code&nbsp;<span class="material-symbols-outlined">qr_code</span>
                             </button>
-                            <button onclick="copyToClipboard('https://${hostName}/wow/${userID}#rsae63-WoW', false)">
+                            <button onclick="copyToClipboard('https://${hostName}/wow/${userID}#rsae-WoW', false)">
                                 Copy Sub<span class="material-symbols-outlined">format_list_bulleted</span>
                             </button>
                         </td>
@@ -2185,7 +2185,7 @@ const renderHomePage = async (env, hostName, fragConfigs) => {
                             </div>
                         </td>
 						<td>
-                            <button onclick="copyToClipboard('https://${hostName}/wow/${userID}?app=singbox#rsae63-WoW', false)">
+                            <button onclick="copyToClipboard('https://${hostName}/wow/${userID}?app=singbox#rsae-WoW', false)">
                                 Copy Sub<span class="material-symbols-outlined">format_list_bulleted</span>
                             </button>
 						</td>
@@ -2232,7 +2232,7 @@ const renderHomePage = async (env, hostName, fragConfigs) => {
             <hr>
             <div class="footer">
                 <i class="fa fa-github" style="font-size:36px; margin-right: 10px;"></i>
-                <a class="link" href="https://github.com/bia-pain-bache/rsae63-Worker-Panel" target="_blank">Github</a>
+                <a class="link" href="https://github.com/bia-pain-bache/rsae-Worker-Panel" target="_blank">Github</a>
                 <button id="openModalBtn" class="button">Change Password</button>
                 <button type="button" id="logout" style="background: none; margin: 0; border: none; cursor: pointer;">
                     <i class="fa fa-power-off fa-2x" aria-hidden="true"></i>
@@ -2560,7 +2560,7 @@ const renderLoginPage = async () => {
     </head>
     <body>
         <div class="container">
-            <h1>rsaePanel <span style="font-size: smaller;">${panelVersion}</span> 👹</h1>
+            <h1>rsae Panel <span style="font-size: smaller;">${panelVersion}</span> 👹</h1>
             <div class="form-container">
                 <h2>User Login</h2>
                 <form id="loginForm">
@@ -2631,10 +2631,10 @@ const renderErrorPage = (message, error, refer) => {
 
     <body>
         <div id="error-container">
-            <h1>rsaePanel <span style="font-size: smaller;">${panelVersion}</span> 👹</h1>
+            <h1>rsae Panel <span style="font-size: smaller;">${panelVersion}</span> 👹</h1>
             <div id="error-message">
                 <h2>${message} ${refer 
-                    ? 'Please try again or refer to <a href="https://github.com/bia-pain-bache/rsae63-Worker-Panel/blob/main/README.md">documents</a>' 
+                    ? 'Please try again or refer to <a href="https://github.com/bia-pain-bache/rsae-Worker-Panel/blob/main/README.md">documents</a>' 
                     : ''}
                 </h2>
                 <p><b>${error ? `⚠️ ${error}` : ''}</b></p>
