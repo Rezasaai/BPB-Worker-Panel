@@ -127,7 +127,7 @@ export default {
 
                         let secretKey = await env.rsae.get('secretKey');
                         const pwd = await env.rsae.get('pwd');
-                        if (!pwd) await env.rsae.put('pwd', 'rsae63');
+                        if (!pwd) await env.rsae.put('pwd', 'Rsae63');
 
                         if (!secretKey) {
                             secretKey = generateSecretKey();
@@ -2444,7 +2444,7 @@ const renderHomePage = async (env, hostName, fragConfigs) => {
 
             const hasCapitalLetter = /[A-Z]/.test(newPassword);
             const hasNumber = /[0-9]/.test(newPassword);
-            const isLongEnough = newPassword.length >= 8;
+            const isLongEnough = newPassword.length >= 6;
 
             if (!(hasCapitalLetter && hasNumber && isLongEnough)) {
                 passwordError.textContent = '⚠️ Password must contain at least one capital letter, one number, and be at least 8 characters long.';
